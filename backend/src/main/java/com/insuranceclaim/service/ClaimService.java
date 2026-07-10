@@ -32,7 +32,9 @@ public class ClaimService {
 
     public ClaimState submit(ClaimRequest request) {
         ClaimState state = new ClaimState();
-        state.setClaimId(nextClaimId());
+        String id = (request.getClaimId() != null && !request.getClaimId().isBlank())
+                ? request.getClaimId() : nextClaimId();
+        state.setClaimId(id);
         state.setCustomerName(request.getCustomerName());
         state.setPolicyNumber(request.getPolicyNumber());
         state.setClaimType(request.getClaimType());
@@ -77,13 +79,22 @@ public class ClaimService {
         if (state.getStatus() != WorkflowStatus.PENDING_REVIEW) {
             throw new IllegalStateException("Claim " + claimId + " is not awaiting review.");
         }
-        if (request.getDecision() != Decision.APPROVED && request.getDecision() != Decision.REJECTED) {
-            throw new IllegalArgumentException("Reviewer decision must be APPROVED or REJECTED.");
+        if (request.getDecision() != Decision.APPROVED
+                && request.getDecision() != Decision.REJECTED
+                && request.getDecision() != Decision.REQUEST_DOCUMENTS) {
+            throw new IllegalArgumentException("Reviewer decision must be APPROVED, REJECTED, or REQUEST_DOCUMENTS.");
         }
         state.setReviewerDecision(request.getDecision());
         state.setReviewerComments(request.getComments());
         state.setReviewerName(request.getReviewerName());
-        workflow.resumeAfterReview(state);
+        if (request.getDecision() == Decision.REQUEST_DOCUMENTS) {
+            state.audit("human_review", "Reviewer " + request.getReviewerName()
+                    + " requested additional documents: " + request.getComments());
+            state.setReviewerDecision(null);
+            state.setStatus(WorkflowStatus.PENDING_REVIEW);
+        } else {
+            workflow.resumeAfterReview(state);
+        }
         return state;
     }
 

@@ -5,6 +5,7 @@ export function DecisionBadge({ decision }: { decision: Decision }) {
     APPROVED: 'badge badge-approved',
     REJECTED: 'badge badge-rejected',
     MANUAL_REVIEW: 'badge badge-review',
+    REQUEST_DOCUMENTS: 'badge badge-docs',
     PENDING: 'badge badge-pending',
   };
   const label = decision.replace('_', ' ');

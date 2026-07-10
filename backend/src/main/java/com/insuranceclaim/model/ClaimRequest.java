@@ -9,6 +9,8 @@ import java.util.List;
 /** Incoming payload for submitting a new claim from the UI. */
 public class ClaimRequest {
 
+    private String claimId;
+
     @NotBlank
     private String customerName;
 
@@ -28,6 +30,14 @@ public class ClaimRequest {
     private String description;
 
     private List<String> documentsUploaded = new ArrayList<>();
+
+    public String getClaimId() {
+        return claimId;
+    }
+
+    public void setClaimId(String claimId) {
+        this.claimId = claimId;
+    }
 
     public String getCustomerName() {
         return customerName;
