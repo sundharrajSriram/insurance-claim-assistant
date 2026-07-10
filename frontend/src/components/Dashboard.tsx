@@ -19,6 +19,8 @@ export default function Dashboard({
     api.listClaims().then(setClaims).catch(() => setClaims([]));
   }, [refreshKey]);
 
+  const latestClaim = claims.length > 0 ? claims[0] : null;
+
   return (
     <div className="page">
       <div className="page-head">
@@ -34,6 +36,29 @@ export default function Dashboard({
         <StatCard label="Rejected" value={stats?.rejected ?? 0} tone="rejected" />
         <StatCard label="Awaiting review" value={stats?.pendingReview ?? 0} tone="review" />
       </div>
+
+      {/* Graph progression for latest claim */}
+      {latestClaim && (
+        <div className="card dash-progression">
+          <div className="dash-prog-header">
+            <h3>Latest Claim: Agent Progression</h3>
+            <button className="link" onClick={() => onOpen(latestClaim)}>
+              {latestClaim.claimId} &middot; {latestClaim.customerName}
+            </button>
+          </div>
+          <p className="muted">
+            Graph flow: validation &rarr; policy &rarr; documents &rarr; fraud &rarr; risk &rarr; recommendation
+          </p>
+          <div className="node-progression">
+            <ProgBadge label="Validation" ok={latestClaim.validationStatus === 'VALID'} detail={latestClaim.validationStatus} />
+            <ProgBadge label="Policy" ok={latestClaim.policyEligible} detail={latestClaim.policyStatus} />
+            <ProgBadge label="Documents" ok={latestClaim.documentStatus === 'COMPLETE'} detail={latestClaim.documentStatus} />
+            <ProgBadge label="Fraud" ok={latestClaim.fraudScore < 40} detail={`Score: ${latestClaim.fraudScore}`} />
+            <ProgBadge label="Risk" ok={latestClaim.riskLevel === 'LOW'} detail={latestClaim.riskLevel} />
+            <ProgBadge label="Decision" ok={latestClaim.recommendation === 'APPROVED'} detail={latestClaim.recommendation?.replace('_', ' ')} />
+          </div>
+        </div>
+      )}
 
       <div className="dash-layout">
         <div className="card">
@@ -74,6 +99,18 @@ function StatCard({
     <div className={`stat-card stat-${tone}`}>
       <div className="stat-value">{value}</div>
       <div className="stat-label">{label}</div>
+    </div>
+  );
+}
+
+function ProgBadge({ label, ok, detail }: { label: string; ok: boolean; detail: string }) {
+  return (
+    <div className={`prog-badge ${ok ? 'prog-badge-pass' : 'prog-badge-fail'}`}>
+      <span className="prog-badge-icon">{ok ? '\u2713' : '\u2717'}</span>
+      <div className="prog-badge-text">
+        <span className="prog-badge-label">{label}</span>
+        <span className="prog-badge-detail">{detail}</span>
+      </div>
     </div>
   );
 }

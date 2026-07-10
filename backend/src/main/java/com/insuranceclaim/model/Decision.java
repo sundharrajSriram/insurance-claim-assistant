@@ -8,5 +8,6 @@ public enum Decision {
     APPROVED,
     REJECTED,
     MANUAL_REVIEW,
+    REQUEST_DOCUMENTS,
     PENDING
 }

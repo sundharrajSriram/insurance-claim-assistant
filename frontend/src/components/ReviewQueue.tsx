@@ -106,6 +106,13 @@ export default function ReviewQueue({
               >
                 Reject
               </button>
+              <button
+                className="btn btn-docs"
+                disabled={busy === c.claimId}
+                onClick={() => decide(c.claimId, 'REQUEST_DOCUMENTS')}
+              >
+                Request Documents
+              </button>
             </div>
           </div>
         ))}

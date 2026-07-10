@@ -1,4 +1,4 @@
-export type Decision = 'APPROVED' | 'REJECTED' | 'MANUAL_REVIEW' | 'PENDING';
+export type Decision = 'APPROVED' | 'REJECTED' | 'MANUAL_REVIEW' | 'REQUEST_DOCUMENTS' | 'PENDING';
 export type WorkflowStatus = 'PROCESSING' | 'PENDING_REVIEW' | 'COMPLETED';
 export type RiskLevel = 'LOW' | 'MEDIUM' | 'HIGH';
 
@@ -44,6 +44,7 @@ export interface ClaimState {
 }
 
 export interface ClaimRequest {
+  claimId: string;
   customerName: string;
   policyNumber: string;
   claimType: string;
